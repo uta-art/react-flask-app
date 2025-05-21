@@ -1,0 +1,26 @@
+# Python関連
+backend/__pycache__/
+backend/*.pyc
+
+# Flask-Migrate関連
+backend/migrations/
+
+# Node関連
+frontend/node_modules/
+frontend/build/
+
+# バックアップ・一時ファイル
+*.sqlite3
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# .envファイル
+*.env
+.env
+
+# Macやエディタの一時ファイル
+.DS_Store
+.vscode/
