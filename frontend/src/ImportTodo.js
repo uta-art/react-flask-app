@@ -1,0 +1,39 @@
+import React, { useState } from 'react';
+
+function ImportTodo({ onImported }) {
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleImport = async () => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    // FlaskバックエンドのエンドポイントにPOST
+    // await fetch('http://localhost:5000/api/import_csv', {
+    //   method: 'POST',
+    //   body: formData,
+    // });
+    setFile(null);
+    if (onImported) onImported(); // インポート後にリスト再取得など
+  };
+
+  return (
+    <div style={{ marginTop: "1rem" }}>
+      <input
+        type="file"
+        accept=".csv"
+        onChange={handleFileChange}
+        style={{ marginRight: "0.5rem" }}
+      />
+      <button onClick={handleImport} disabled={!file}>
+        一括インポート
+      </button>
+    </div>
+  );
+}
+
+export default ImportTodo;

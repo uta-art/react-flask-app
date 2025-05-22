@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ImportTodo from './ImportTodo';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -66,10 +67,11 @@ function App() {
           value={task}
           onChange={e => setTask(e.target.value)}
           placeholder="新しいタスクを入力"
-          style={{ width: "70%" }}
+          style={{ width: "70%", marginRight: "1rem" }}
         />
         <button type="submit">追加</button>
       </form>
+      <ImportTodo onImported={fetchTodos} />
       <table style={{ width: "100%", marginTop: "2rem", borderCollapse: "collapse" }}>
         <thead>
           <tr>
