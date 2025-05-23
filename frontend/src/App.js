@@ -32,6 +32,9 @@ function App() {
   };
 
   const deleteTodo = async (id) => {
+    // ブラウザ標準の確認ダイアログ
+    const ok = window.confirm("本当に削除しますか？");
+    if (!ok) return;
     await fetch(`http://localhost:5000/api/todos/${id}`, {
       method: 'DELETE',
     });
@@ -60,7 +63,7 @@ function App() {
   };
 
   return (
-    <div className="container" style={{ maxWidth: 600, marginTop: "2rem" }}>
+    <div className="container" style={{ marginTop: "2rem", maxWidth: 700 }}>
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="mb-4 text-primary text-center">Todoアプリ</h2>
@@ -75,13 +78,12 @@ function App() {
             <button className="btn btn-primary" type="submit">追加</button>
           </form>
           <ImportTodo onImported={fetchTodos} />
-
-          <table className="table table-striped table-hover mt-4 align-middle">
+          <table className="table table-striped table-hover mt-4 align-middle" style={{ tableLayout: "fixed", width: "100%" }}>
             <thead>
-              <tr>
-                <th>id</th>
+              <tr style={{ maxWidth: 700 }}>
+                <th style={{ width: "60px" }}>id</th>
                 <th>タスク</th>
-                <th className="text-center" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>操作</th>
+                <th style={{ width: "120px" }}>操作</th>
               </tr>
             </thead>
             <tbody>
@@ -112,8 +114,8 @@ function App() {
                       <span>{todo.task}</span>
                     )}
                   </td>
-                  <td className="text-center" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
-                    <div className="d-flex justify-content-center gap-2">
+                  <td className="text-end" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
+                    <div className="d-flex justify-content-end gap-2">
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => deleteTodo(todo.id)}

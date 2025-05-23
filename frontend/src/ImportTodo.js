@@ -22,16 +22,23 @@ function ImportTodo({ onImported }) {
   };
 
   return (
-    <div style={{ marginTop: "1rem" }}>
-      <input
-        type="file"
-        accept=".csv"
-        onChange={handleFileChange}
-        style={{ marginRight: "0.5rem" }}
-      />
-      <button onClick={handleImport} disabled={!file}>
-        一括インポート
-      </button>
+    <div className="mt-3">
+      <div className="input-group" style={{ maxWidth: 700 }}>
+        <input
+          type="file"
+          accept=".csv"
+          className="form-control"
+          onChange={handleFileChange}
+        />
+        <button
+          className="btn btn-success"
+          onClick={handleImport}
+          disabled={!file}
+          type="button"
+        >
+          一括インポート
+        </button>
+      </div>
     </div>
   );
 }
