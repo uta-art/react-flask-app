@@ -1,4 +1,5 @@
 # Python関連
+backend/app/__pycache__/
 backend/__pycache__/
 backend/*.pyc
 

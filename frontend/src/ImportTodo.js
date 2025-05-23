@@ -12,11 +12,11 @@ function ImportTodo({ onImported }) {
     const formData = new FormData();
     formData.append('file', file);
 
-    // FlaskバックエンドのエンドポイントにPOST
-    // await fetch('http://localhost:5000/api/import_csv', {
-    //   method: 'POST',
-    //   body: formData,
-    // });
+    //FlaskバックエンドのエンドポイントにPOST
+    await fetch('http://localhost:5000/api/import_csv', {
+      method: 'POST',
+      body: formData,
+    });
     setFile(null);
     if (onImported) onImported(); // インポート後にリスト再取得など
   };

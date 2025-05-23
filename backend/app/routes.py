@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .services import get_all_todos, add_todo, delete_todo, update_todo
+from .services import get_all_todos, add_todo, delete_todo, update_todo, import_todos_from_csv
 
 bp = Blueprint('api', __name__)
 
@@ -32,3 +32,17 @@ def edit_todo_route(todo_id):
     if ok:
         return jsonify({"message": "Updated"}), 200
     return jsonify({"error": err}), 400
+
+@bp.route('/api/import_csv', methods=['POST'])
+def import_csv():
+    if 'file' not in request.files:
+        return jsonify({'error': 'ファイルがありません'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'ファイルが選択されていません'}), 400
+
+    try:
+        count = import_todos_from_csv(file)
+        return jsonify({'message': f'{count}件インポートしました'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
