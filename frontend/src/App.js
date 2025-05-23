@@ -60,69 +60,78 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "2rem auto" }}>
-      <h2>Todoアプリ</h2>
-      <form onSubmit={addTodo}>
-        <input
-          value={task}
-          onChange={e => setTask(e.target.value)}
-          placeholder="新しいタスクを入力"
-          style={{ width: "70%", marginRight: "1rem" }}
-        />
-        <button type="submit">追加</button>
-      </form>
-      <ImportTodo onImported={fetchTodos} />
-      <table style={{ width: "100%", marginTop: "2rem", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: "0.5em" }}>id</th>
-            <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: "0.5em" }}>タスク</th>
-            <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: "0.5em" }}>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {todos.map(todo => (
-            <tr key={todo.id}>
-              <td style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>{todo.id}</td>
-              <td style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
-                {editingId === todo.id ? (
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    <input
-                      value={editTask}
-                      onChange={e => setEditTask(e.target.value)}
-                      style={{ width: "90%" }}
-                    />
-                    <div style={{ marginTop: "0.5em" }}>
+    <div className="container" style={{ maxWidth: 600, marginTop: "2rem" }}>
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <h2 className="mb-4 text-primary text-center">Todoアプリ</h2>
+          <form className="d-flex mb-3 gap-2" onSubmit={addTodo}>
+            <input
+              className="form-control"
+              value={task}
+              onChange={e => setTask(e.target.value)}
+              placeholder="新しいタスクを入力"
+              style={{ minWidth: 0 }}
+            />
+            <button className="btn btn-primary" type="submit">追加</button>
+          </form>
+          <ImportTodo onImported={fetchTodos} />
+
+          <table className="table table-striped table-hover mt-4 align-middle">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>タスク</th>
+                <th className="text-center" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              {todos.map(todo => (
+                <tr key={todo.id}>
+                  <td>{todo.id}</td>
+                  <td>
+                    {editingId === todo.id ? (
+                      <div>
+                        <input
+                          className="form-control"
+                          value={editTask}
+                          onChange={e => setEditTask(e.target.value)}
+                          style={{ width: "100%" }}
+                        />
+                        <div className="mt-2 d-flex gap-2">
+                          <button
+                            className="btn btn-success btn-sm"
+                            onClick={() => saveTodo(todo.id)}
+                          >保存</button>
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={cancelEdit}
+                          >キャンセル</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span>{todo.task}</span>
+                    )}
+                  </td>
+                  <td className="text-center" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
+                    <div className="d-flex justify-content-center gap-2">
                       <button
-                        style={{ color: 'green', cursor: 'pointer', marginRight: '5px' }}
-                        onClick={() => saveTodo(todo.id)}
-                      >保存</button>
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteTodo(todo.id)}
+                        disabled={editingId === todo.id}
+                      >削除</button>
                       <button
-                        style={{ color: 'gray', cursor: 'pointer' }}
-                        onClick={cancelEdit}
-                      >キャンセル</button>
+                        className="btn btn-info btn-sm text-white"
+                        onClick={() => editTodo(todo.id, todo.task)}
+                        disabled={editingId === todo.id}
+                      >編集</button>
                     </div>
-                  </div>
-                ) : (
-                  todo.task
-                )}
-              </td>
-              <td style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
-                <button
-                  style={{ color: 'red', cursor: 'pointer', marginRight: '5px' }}
-                  onClick={() => deleteTodo(todo.id)}
-                  disabled={editingId === todo.id}
-                >削除</button>
-                <button
-                  style={{ color: 'blue', cursor: 'pointer' }}
-                  onClick={() => editTodo(todo.id, todo.task)}
-                  disabled={editingId === todo.id}
-                >編集</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
