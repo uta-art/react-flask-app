@@ -1,10 +1,11 @@
 from .models import db, Todo
 import csv
 import io
+from io import StringIO
 
 def get_all_todos():
     todos = Todo.query.order_by(Todo.id.desc()).all()
-    return [{"id": t.id, "task": t.task} for t in todos]
+    return [{"id": t.id, "task": t.task, "created_at": t.created_at.strftime("%Y-%m-%d %H:%M:%S") if t.created_at else ""} for t in todos]
 
 def add_todo(task):
     if not task:
@@ -43,3 +44,13 @@ def import_todos_from_csv(file_storage):
         count += 1
     db.session.commit()
     return count
+
+def export_todos_csv():
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['id', 'task', 'created_at'])
+    todos = Todo.query.order_by(Todo.id.desc()).all()
+    for todo in todos:
+        writer.writerow([todo.id, todo.task, todo.created_at])
+    output.seek(0)
+    return output

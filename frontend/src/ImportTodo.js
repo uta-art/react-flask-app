@@ -22,8 +22,8 @@ function ImportTodo({ onImported }) {
   };
 
   return (
-    <div className="mt-3">
-      <div className="input-group" style={{ maxWidth: 700 }}>
+    <div className="d-flex justify-content-end">
+      <div className="input-group" style={{ maxWidth: 500 }}>
         <input
           type="file"
           accept=".csv"
@@ -31,7 +31,7 @@ function ImportTodo({ onImported }) {
           onChange={handleFileChange}
         />
         <button
-          className="btn btn-success"
+          className="btn btn-outline-success"
           onClick={handleImport}
           disabled={!file}
           type="button"

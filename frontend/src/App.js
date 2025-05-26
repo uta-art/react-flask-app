@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ImportTodo from './ImportTodo';
+import ExportTodos from './ExportTodo';
 
 function App() {
   const [todos, setTodos] = useState([]);
@@ -63,7 +64,7 @@ function App() {
   };
 
   return (
-    <div className="container" style={{ marginTop: "2rem", maxWidth: 700 }}>
+    <div className="container" style={{ marginTop: "2rem" }}>
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="mb-4 text-primary text-center">Todoアプリ</h2>
@@ -77,12 +78,16 @@ function App() {
             />
             <button className="btn btn-primary" type="submit">追加</button>
           </form>
+        <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
           <ImportTodo onImported={fetchTodos} />
+          <ExportTodos />
+        </div>
           <table className="table table-striped table-hover mt-4 align-middle" style={{ tableLayout: "fixed", width: "100%" }}>
             <thead>
               <tr style={{ maxWidth: 700 }}>
                 <th style={{ width: "60px" }}>id</th>
                 <th>タスク</th>
+                <th style={{ width: "200px" }}>登録日</th>
                 <th style={{ width: "120px" }}>操作</th>
               </tr>
             </thead>
@@ -114,6 +119,7 @@ function App() {
                       <span>{todo.task}</span>
                     )}
                   </td>
+                  <td>{todo.created_at}</td>
                   <td className="text-end" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
                     <div className="d-flex justify-content-end gap-2">
                       <button

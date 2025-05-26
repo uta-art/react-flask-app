@@ -1,5 +1,5 @@
-from flask import Blueprint, request, jsonify
-from .services import get_all_todos, add_todo, delete_todo, update_todo, import_todos_from_csv
+from flask import Blueprint, request, jsonify, Response
+from .services import get_all_todos, add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv
 
 bp = Blueprint('api', __name__)
 
@@ -46,3 +46,12 @@ def import_csv():
         return jsonify({'message': f'{count}件インポートしました'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@bp.route('/api/export_csv', methods=['GET'])
+def export_csv():
+    output = export_todos_csv()
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={"Content-Disposition": "attachment; filename=todos.csv"}
+    )
