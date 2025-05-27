@@ -66,6 +66,15 @@ def export_todos_csv():
     output.seek(0)
     return output
 
+def bulk_delete_todos(ids):
+    try:
+        Todo.query.filter(Todo.id.in_(ids)).delete(synchronize_session=False)
+        db.session.commit()
+        return True, None
+    except Exception as e:
+        db.session.rollback()
+        return False, str(e)
+
 def _to_jst(dt):
     if dt is None:
         return None

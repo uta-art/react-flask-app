@@ -11,6 +11,9 @@ function App() {
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [message, setMessage] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // ToDo取得処理
   const fetchTodos = async (pageNum = page) => {
@@ -35,13 +38,17 @@ function App() {
   const addTodo = async (e) => {
     e.preventDefault();
     if (!task) return;
-    await fetch('http://localhost:5000/api/todos', {
+    const res = await fetch('http://localhost:5000/api/todos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task }),
     });
     setTask('');
     fetchTodos(page);
+    if (res.ok) {
+      setMessage(true);
+      setTimeout(() => setMessage(false), 7000)
+    }
   };
 
   // 削除
@@ -81,6 +88,19 @@ function App() {
   // インポート完了時（リスト再取得用）
   const handleImported = () => fetchTodos(page);
 
+  const handleBulkDelete = async () => {
+    if (!window.confirm("選択したタスクを一括削除します。よろしいですか？")) return;
+    await fetch('http://localhost:5000/api/todos/bulk_delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: selectedIds }),
+    });
+    setSelectedIds([]);
+    setSelectMode(false);
+    fetchTodos(page);
+  };
+
+
   return (
     <div className="container" style={{ marginTop: "2rem" }}>
       <div className="card shadow-sm">
@@ -97,13 +117,31 @@ function App() {
             <button className="btn btn-primary" type="submit">追加</button>
           </form>
           <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => {
+                setSelectMode(!selectMode);
+                setSelectedIds([]); // 選択解除
+              }}
+            >
+              {selectMode ? '選択解除' : '選択'}
+            </button>
+            {selectMode && (
+              <button
+                className="btn btn-danger"
+                disabled={selectedIds.length === 0}
+                onClick={handleBulkDelete}
+              >
+                一括削除
+              </button>
+            )}
             <ImportTodo onImported={handleImported} />
             <ExportTodos />
           </div>
           <table className="table table-striped table-hover mt-4 align-middle" style={{ tableLayout: "fixed", width: "100%" }}>
             <thead>
               <tr style={{ maxWidth: 700 }}>
-                <th style={{ width: "60px" }}>id</th>
+                {selectMode && <th style={{ width: "40px" }}></th>}
                 <th>タスク</th>
                 <th style={{ width: "200px" }}>登録日</th>
                 <th style={{ width: "120px" }}>操作</th>
@@ -112,7 +150,21 @@ function App() {
             <tbody>
               {todos.map(todo => (
                 <tr key={todo.id}>
-                  <td>{todo.id}</td>
+                  {selectMode && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(todo.id)}
+                        onChange={e => {
+                          if (e.target.checked) {
+                            setSelectedIds([...selectedIds, todo.id]);
+                          } else {
+                            setSelectedIds(selectedIds.filter(id => id !== todo.id));
+                          }
+                        }}
+                      />
+                    </td>
+                  )}
                   <td>
                     {editingId === todo.id ? (
                       <div>
@@ -181,6 +233,23 @@ function App() {
               </select>
           </div>
         </div>
+              {/* トースト（ポップアップ通知） */}
+      {message && (
+        <div
+          className="toast show position-absolute top-0 end-0"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          style={{ minWidth: 200, zIndex: 9999 }}
+        >
+          <div className="toast-header bg-success text-white">
+            <strong className="me-auto">通知</strong>
+          </div>
+          <div className="toast-body">
+            登録に成功しました
+          </div>
+        </div>
+      )}
       </div>
     </div>
   );

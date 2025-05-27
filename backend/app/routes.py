@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, Response
-from .services import add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv, get_paginated_todos
+from .services import add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv, get_paginated_todos, bulk_delete_todos
 
 bp = Blueprint('api', __name__)
 
@@ -57,3 +57,11 @@ def export_csv():
         mimetype='text/csv',
         headers={"Content-Disposition": "attachment; filename=todos.csv"}
     )
+
+@bp.route('/api/todos/bulk_delete', methods=['POST'])
+def bulk_delete():
+    ids = request.json.get('ids', [])
+    ok, err = bulk_delete_todos(ids)
+    if ok:
+        return jsonify({"message": "Deleted"}), 200
+    return jsonify({"error": err}), 400

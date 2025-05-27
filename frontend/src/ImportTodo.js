@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 function ImportTodo({ onImported }) {
   const [file, setFile] = useState(null);
+  const [showToast, setShowToast] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -13,12 +14,16 @@ function ImportTodo({ onImported }) {
     formData.append('file', file);
 
     //FlaskバックエンドのエンドポイントにPOST
-    await fetch('http://localhost:5000/api/import_csv', {
+    const res = await fetch('http://localhost:5000/api/import_csv', {
       method: 'POST',
       body: formData,
     });
+    if (res.ok) {
+      setShowToast(true);
+      if (onImported) onImported();
+      setTimeout(() => setShowToast(false), 7000); // 2秒で消す
+    }
     setFile(null);
-    if (onImported) onImported(); // インポート後にリスト再取得など
   };
 
   return (
@@ -39,6 +44,23 @@ function ImportTodo({ onImported }) {
           一括インポート
         </button>
       </div>
+      {/* トースト（ポップアップ通知） */}
+      {showToast && (
+        <div
+          className="toast show position-absolute top-0 end-0"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          style={{ minWidth: 200, zIndex: 9999 }}
+        >
+          <div className="toast-header bg-success text-white">
+            <strong className="me-auto">通知</strong>
+          </div>
+          <div className="toast-body">
+            インポートに成功しました
+          </div>
+        </div>
+      )}
     </div>
   );
 }
