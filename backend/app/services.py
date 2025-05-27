@@ -2,10 +2,21 @@ from .models import db, Todo
 import csv
 import io
 from io import StringIO
+from zoneinfo import ZoneInfo
 
-def get_all_todos():
-    todos = Todo.query.order_by(Todo.id.desc()).all()
-    return [{"id": t.id, "task": t.task, "created_at": t.created_at.strftime("%Y-%m-%d %H:%M:%S") if t.created_at else ""} for t in todos]
+def get_paginated_todos(page=1, per_page=10):
+    pagination = Todo.query.order_by(Todo.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    todos = [
+        {"id": todo.id, "task": todo.task, "created_at": _to_jst(todo.created_at) if todo.created_at else None}
+        for todo in pagination.items
+    ]
+    return {
+        "todos": todos,
+        "total": pagination.total,
+        "page": page,
+        "per_page": per_page,
+        "pages": pagination.pages
+    }
 
 def add_todo(task):
     if not task:
@@ -54,3 +65,9 @@ def export_todos_csv():
         writer.writerow([todo.id, todo.task, todo.created_at])
     output.seek(0)
     return output
+
+def _to_jst(dt):
+    if dt is None:
+        return None
+    # UTC→JSTへ変換
+    return dt.astimezone(ZoneInfo("Asia/Tokyo")).strftime('%Y/%m/%d %H:%M:%S')

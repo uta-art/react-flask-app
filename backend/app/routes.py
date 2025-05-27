@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify, Response
-from .services import get_all_todos, add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv
+from .services import add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv, get_paginated_todos
 
 bp = Blueprint('api', __name__)
 
 @bp.route('/api/todos', methods=['GET'])
 def get_todos():
-    todos = get_all_todos()
-    return jsonify(todos)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    result = get_paginated_todos(page, per_page)
+    return jsonify(result)
 
 @bp.route('/api/todos', methods=['POST'])
 def add_todo_route():

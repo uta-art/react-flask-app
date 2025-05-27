@@ -3,20 +3,32 @@ import ImportTodo from './ImportTodo';
 import ExportTodos from './ExportTodo';
 
 function App() {
+  // state追加
   const [todos, setTodos] = useState([]);
   const [task, setTask] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editTask, setEditTask] = useState('');
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
-  // 初回マウント時にAPIからToDo取得
+  // ToDo取得処理
+  const fetchTodos = async (pageNum = page) => {
+    const res = await fetch(`http://localhost:5000/api/todos?page=${pageNum}&per_page=${perPage}`);
+    const data = await res.json();
+    setTodos(data.todos);
+    setPage(data.page);
+    setTotalPages(data.pages);
+  };
+
   useEffect(() => {
-    fetchTodos();
-  }, []);
+    fetchTodos(page, perPage);
+    // eslint-disable-next-line
+  }, [page, perPage]);
 
-  // ToDo取得処理を共通化
-  const fetchTodos = async () => {
-    const res = await fetch('http://localhost:5000/api/todos');
-    setTodos(await res.json());
+  const handlePerPageChange = (e) => {
+    setPerPage(Number(e.target.value));
+    setPage(1); // 件数を変えたら1ページ目に戻す
   };
 
   // 新規ToDo追加
@@ -29,39 +41,45 @@ function App() {
       body: JSON.stringify({ task }),
     });
     setTask('');
-    fetchTodos();
+    fetchTodos(page);
   };
 
+  // 削除
   const deleteTodo = async (id) => {
-    // ブラウザ標準の確認ダイアログ
     const ok = window.confirm("本当に削除しますか？");
     if (!ok) return;
     await fetch(`http://localhost:5000/api/todos/${id}`, {
       method: 'DELETE',
     });
-    fetchTodos();
+    fetchTodos(page);
   }
 
+  // 編集開始
   const editTodo = (id, currentTask) => {
     setEditingId(id);
     setEditTask(currentTask);
   }
 
+  // 編集保存
   const saveTodo = async (id) => {
     await fetch(`http://localhost:5000/api/todos/${id}`, {
-      method: 'PUt',
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ task: editTask }),
     });
     setEditingId(null);
     setEditTask('');
-    fetchTodos();
+    fetchTodos(page);
   };
 
+  // 編集キャンセル
   const cancelEdit = () => {
-  setEditingId(null);
-  setEditTask('');
+    setEditingId(null);
+    setEditTask('');
   };
+
+  // インポート完了時（リスト再取得用）
+  const handleImported = () => fetchTodos(page);
 
   return (
     <div className="container" style={{ marginTop: "2rem" }}>
@@ -78,10 +96,10 @@ function App() {
             />
             <button className="btn btn-primary" type="submit">追加</button>
           </form>
-        <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
-          <ImportTodo onImported={fetchTodos} />
-          <ExportTodos />
-        </div>
+          <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+            <ImportTodo onImported={handleImported} />
+            <ExportTodos />
+          </div>
           <table className="table table-striped table-hover mt-4 align-middle" style={{ tableLayout: "fixed", width: "100%" }}>
             <thead>
               <tr style={{ maxWidth: 700 }}>
@@ -138,6 +156,30 @@ function App() {
               ))}
             </tbody>
           </table>
+          {/* ページ送り */}
+          <div className="d-flex justify-content-center my-3">
+            <button
+              className="btn btn-outline-secondary mx-2"
+              disabled={page <= 1}
+              onClick={() => setPage(page - 1)}
+            >
+              前へ
+            </button>
+            <span style={{ lineHeight: "2.4" }}>{page} / {totalPages}</span>
+            <button
+              className="btn btn-outline-secondary mx-2"
+              disabled={page >= totalPages}
+              onClick={() => setPage(page + 1)}
+            >
+              次へ
+            </button>
+            <label htmlFor="perPage" className="me-2 mt-2 ">表示件数: </label>
+              <select id="perPage" className="form-select d-inline-block" style={{ width: 100 }} value={perPage} onChange={handlePerPageChange}>
+                <option value={10}>10件</option>
+                <option value={50}>50件</option>
+                <option value={100}>100件</option>
+              </select>
+          </div>
         </div>
       </div>
     </div>
