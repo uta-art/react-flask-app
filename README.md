@@ -1,6 +1,6 @@
 # React Flask App
 
-React + FlasのDockerベースお試し開発環境構築メモ
+React + FlaskのDockerベースお試し開発環境構築メモ
 
 ## プロジェクト構成
 
