@@ -1,6 +1,6 @@
 # React Flask App
-
-React + FlaskのDockerベースお試し開発環境構築メモ
+参画PJ変更に伴う、技術キャッチアップのため簡易Todoアプリを作成。
+以下、React + FlaskのDockerベースお試し開発環境構築メモ
 
 ## プロジェクト構成
 
