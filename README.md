@@ -7,8 +7,6 @@
 - ページネーション
 - メッセージ表示（登録・インポート成功時、削除確認）
 
-以下、React + FlaskのDockerベースお試し開発環境構築メモ
-
 ## プロジェクト構成
 
 ```
@@ -48,6 +46,7 @@ react-flask-app/
     ├── package-lock.json # パッケージロックファイル
     └── package.json      # npmパッケージ設定
 ```
+# 以下、React + FlaskのDockerベース開発環境構築メモ
 
 ## 必要なツール
 
