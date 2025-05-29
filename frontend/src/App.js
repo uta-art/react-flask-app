@@ -100,6 +100,17 @@ function App() {
     fetchTodos(page);
   };
 
+// 全選択/全解除の処理
+  const handleSelectAll = () => {
+    if (selectedIds.length === todos.length) {
+      // 全て選択されている場合は全解除
+      setSelectedIds([]);
+    } else {
+      // 一部または何も選択されていない場合は全選択
+      setSelectedIds(todos.map(todo => todo.id));
+    }
+  };
+
 
   return (
     <div className="container" style={{ marginTop: "2rem" }}>
@@ -141,7 +152,14 @@ function App() {
           <table className="table table-striped table-hover mt-4 align-middle" style={{ tableLayout: "fixed", width: "100%" }}>
             <thead>
               <tr style={{ maxWidth: 700 }}>
-                {selectMode && <th style={{ width: "40px" }}></th>}
+                {selectMode && <th style={{ width: "100px" }}>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={handleSelectAll}
+                  >
+                    {selectedIds.length === todos.length ? "解除" : "全選択"}
+                  </button>
+                </th>}
                 <th>タスク</th>
                 <th style={{ width: "200px" }}>登録日</th>
                 <th style={{ width: "120px" }}>操作</th>
@@ -152,17 +170,19 @@ function App() {
                 <tr key={todo.id}>
                   {selectMode && (
                     <td>
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.includes(todo.id)}
-                        onChange={e => {
-                          if (e.target.checked) {
-                            setSelectedIds([...selectedIds, todo.id]);
-                          } else {
-                            setSelectedIds(selectedIds.filter(id => id !== todo.id));
-                          }
-                        }}
-                      />
+                      <div className="d-flex justify-content-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.includes(todo.id)}
+                          onChange={e => {
+                            if (e.target.checked) {
+                              setSelectedIds([...selectedIds, todo.id]);
+                            } else {
+                              setSelectedIds(selectedIds.filter(id => id !== todo.id));
+                            }
+                          }}
+                        />
+                      </div>
                     </td>
                   )}
                   <td>
