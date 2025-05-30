@@ -3,11 +3,12 @@ import ImportTodo from './ImportTodo';
 import ExportTodos from './ExportTodo';
 
 function App() {
-  // state追加
   const [todos, setTodos] = useState([]);
   const [task, setTask] = useState('');
+  const [deadline, setDeadline] = useState('');
   const [editingId, setEditingId] = useState(null);
   const [editTask, setEditTask] = useState('');
+  const [editDeadline, setEditDeadline] = useState('');
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
@@ -41,9 +42,13 @@ function App() {
     const res = await fetch('http://localhost:5000/api/todos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task }),
+      body: JSON.stringify({
+        task,
+        deadline: deadline || null
+      }),
     });
     setTask('');
+    setDeadline('');
     fetchTodos(page);
     if (res.ok) {
       setMessage(true);
@@ -62,20 +67,39 @@ function App() {
   }
 
   // 編集開始
-  const editTodo = (id, currentTask) => {
+  const editTodo = (id, currentTask, currentDeadline) => {
     setEditingId(id);
     setEditTask(currentTask);
+    // 期限をローカル時間の形式に変換（datetime-local用）
+    if (currentDeadline) {
+      const date = new Date(currentDeadline.replace(' ', 'T') + ':00');
+      const localISOTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      setEditDeadline(localISOTime);
+    } else {
+      setEditDeadline('');
+    }
   }
 
   // 編集保存
   const saveTodo = async (id) => {
+    // 期限をUTC形式に変換
+    let deadlineToSend = null;
+    if (editDeadline) {
+      const localDate = new Date(editDeadline);
+      deadlineToSend = localDate.toISOString();
+    }
+
     await fetch(`http://localhost:5000/api/todos/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ task: editTask }),
+      body: JSON.stringify({
+        task: editTask,
+        deadline: deadlineToSend
+      }),
     });
     setEditingId(null);
     setEditTask('');
+    setEditDeadline('');
     fetchTodos(page);
   };
 
@@ -83,6 +107,7 @@ function App() {
   const cancelEdit = () => {
     setEditingId(null);
     setEditTask('');
+    setEditDeadline('');
   };
 
   // インポート完了時（リスト再取得用）
@@ -111,21 +136,40 @@ function App() {
     }
   };
 
+  // 期限のローカル時間での表示用変換（新規追加用）
+  const handleDeadlineChange = (e) => {
+    setDeadline(e.target.value);
+  };
 
   return (
     <div className="container" style={{ marginTop: "2rem" }}>
       <div className="card shadow-sm">
         <div className="card-body">
           <h2 className="mb-4 text-primary text-center">Todoアプリ</h2>
-          <form className="d-flex mb-3 gap-2" onSubmit={addTodo}>
-            <input
-              className="form-control"
-              value={task}
-              onChange={e => setTask(e.target.value)}
-              placeholder="新しいタスクを入力"
-              style={{ minWidth: 0 }}
-            />
-            <button className="btn btn-primary" type="submit">追加</button>
+          <form className="mb-3" onSubmit={addTodo}>
+            <div className="row g-2 align-items-center">
+              <div className="col">
+                <input
+                  className="form-control"
+                  value={task}
+                  onChange={e => setTask(e.target.value)}
+                  placeholder="新しいタスクを入力"
+                />
+              </div>
+              <div className="col-auto">
+                <input
+                  type="datetime-local"
+                  className="form-control"
+                  value={deadline}
+                  onChange={handleDeadlineChange}
+                  style={{ width: "200px" }}
+                  title="期限（任意）"
+                />
+              </div>
+              <div className="col-auto">
+                <button className="btn btn-primary" type="submit">追加</button>
+              </div>
+            </div>
           </form>
           <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
             <button
@@ -161,7 +205,8 @@ function App() {
                   </button>
                 </th>}
                 <th>タスク</th>
-                <th style={{ width: "200px" }}>登録日</th>
+                <th style={{ width: "180px" }}>期限</th>
+                <th style={{ width: "180px" }}>登録日</th>
                 <th style={{ width: "120px" }}>操作</th>
               </tr>
             </thead>
@@ -189,9 +234,16 @@ function App() {
                     {editingId === todo.id ? (
                       <div>
                         <input
-                          className="form-control"
+                          className="form-control mb-2"
                           value={editTask}
                           onChange={e => setEditTask(e.target.value)}
+                          style={{ width: "100%" }}
+                        />
+                        <input
+                          type="datetime-local"
+                          className="form-control mb-2"
+                          value={editDeadline}
+                          onChange={e => setEditDeadline(e.target.value)}
                           style={{ width: "100%" }}
                         />
                         <div className="mt-2 d-flex gap-2">
@@ -209,6 +261,7 @@ function App() {
                       <span>{todo.task}</span>
                     )}
                   </td>
+                  <td>{todo.deadline || '未設定'}</td>
                   <td>{todo.created_at}</td>
                   <td className="text-end" style={{ padding: "0.5em", borderBottom: "1px solid #eee" }}>
                     <div className="d-flex justify-content-end gap-2">
@@ -219,7 +272,7 @@ function App() {
                       >削除</button>
                       <button
                         className="btn btn-info btn-sm text-white"
-                        onClick={() => editTodo(todo.id, todo.task)}
+                        onClick={() => editTodo(todo.id, todo.task, todo.deadline)}
                         disabled={editingId === todo.id}
                       >編集</button>
                     </div>

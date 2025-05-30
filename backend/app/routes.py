@@ -14,7 +14,8 @@ def get_todos():
 def add_todo_route():
     data = request.get_json()
     task = data.get('task')
-    ok, err = add_todo(task)
+    deadline = data.get('deadline')
+    ok, err = add_todo(task, deadline)
     if ok:
         return jsonify({"message": "Added"}), 201
     return jsonify({"error": err}), 400
@@ -30,7 +31,8 @@ def delete_todo_route(todo_id):
 def edit_todo_route(todo_id):
     data = request.get_json()
     new_task = data.get('task')
-    ok, err = update_todo(todo_id, new_task)
+    new_deadline = data.get('deadline')
+    ok, err = update_todo(todo_id, new_task, new_deadline)
     if ok:
         return jsonify({"message": "Updated"}), 200
     return jsonify({"error": err}), 400
