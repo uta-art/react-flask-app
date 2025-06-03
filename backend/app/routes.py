@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify, Response
-from .services import add_todo, delete_todo, update_todo, import_todos_from_csv, export_todos_csv, get_paginated_todos, bulk_delete_todos
+from .services import (add_todo, delete_todo, update_todo, import_todos_from_csv,
+                      import_todos_from_excel, export_todos_csv,
+                      get_paginated_todos, bulk_delete_todos)
 
 bp = Blueprint('api', __name__)
 
@@ -51,6 +53,20 @@ def import_csv():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@bp.route('/api/import_excel', methods=['POST'])
+def import_excel():
+    if 'file' not in request.files:
+        return jsonify({'error': 'ファイルがありません'}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'ファイルが選択されていません'}), 400
+
+    try:
+        count = import_todos_from_excel(file)
+        return jsonify({'message': f'{count}件インポートしました'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @bp.route('/api/export_csv', methods=['GET'])
 def export_csv():
     output = export_todos_csv()
@@ -58,6 +74,15 @@ def export_csv():
         output.getvalue(),
         mimetype='text/csv',
         headers={"Content-Disposition": "attachment; filename=todos.csv"}
+    )
+
+@bp.route('/api/export_excel', methods=['GET'])
+def export_excel():
+    output = export_todos_excel()
+    return Response(
+        output.getvalue(),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={"Content-Disposition": "attachment; filename=todos.xlsx"}
     )
 
 @bp.route('/api/todos/bulk_delete', methods=['POST'])

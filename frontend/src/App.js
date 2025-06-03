@@ -171,7 +171,8 @@ function App() {
               </div>
             </div>
           </form>
-          <div className="d-flex justify-content-end align-items-center gap-2 mb-3">
+          {/* 操作ボタン群 */}
+          <div className="d-flex justify-content-end align-items-center gap-2 mb-3 flex-wrap">
             <button
               className="btn btn-outline-secondary"
               onClick={() => {
@@ -281,48 +282,71 @@ function App() {
               ))}
             </tbody>
           </table>
-          {/* ページ送り */}
-          <div className="d-flex justify-content-center my-3">
-            <button
-              className="btn btn-outline-secondary mx-2"
-              disabled={page <= 1}
-              onClick={() => setPage(page - 1)}
-            >
-              前へ
-            </button>
-            <span style={{ lineHeight: "2.4" }}>{page} / {totalPages}</span>
-            <button
-              className="btn btn-outline-secondary mx-2"
-              disabled={page >= totalPages}
-              onClick={() => setPage(page + 1)}
-            >
-              次へ
-            </button>
-            <label htmlFor="perPage" className="me-2 mt-2 ">表示件数: </label>
-              <select id="perPage" className="form-select d-inline-block" style={{ width: 100 }} value={perPage} onChange={handlePerPageChange}>
+
+          {/* ページネーション */}
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div>
+              <label htmlFor="perPageSelect" className="form-label me-2">表示件数:</label>
+              <select
+                id="perPageSelect"
+                className="form-select"
+                value={perPage}
+                onChange={handlePerPageChange}
+                style={{ width: "auto", display: "inline-block" }}
+              >
+                <option value={5}>5件</option>
                 <option value={10}>10件</option>
+                <option value={20}>20件</option>
                 <option value={50}>50件</option>
-                <option value={100}>100件</option>
               </select>
+            </div>
+
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0">
+                <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchTodos(page - 1)}
+                    disabled={page === 1}
+                  >前へ</button>
+                </li>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+                  <li key={pageNum} className={`page-item ${page === pageNum ? 'active' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => fetchTodos(pageNum)}
+                    >{pageNum}</button>
+                  </li>
+                ))}
+                <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => fetchTodos(page + 1)}
+                    disabled={page === totalPages}
+                  >次へ</button>
+                </li>
+              </ul>
+            </nav>
           </div>
+
+          {/* 成功メッセージ */}
+          {message && (
+            <div
+              className="toast show position-absolute top-0 end-0"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+              style={{ minWidth: 200, zIndex: 9999 }}
+            >
+              <div className="toast-header bg-primary text-white">
+                <strong className="me-auto">通知</strong>
+              </div>
+              <div className="toast-body">
+                タスクを追加しました
+              </div>
+            </div>
+          )}
         </div>
-              {/* トースト（ポップアップ通知） */}
-      {message && (
-        <div
-          className="toast show position-absolute top-0 end-0"
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
-          style={{ minWidth: 200, zIndex: 9999 }}
-        >
-          <div className="toast-header bg-success text-white">
-            <strong className="me-auto">通知</strong>
-          </div>
-          <div className="toast-body">
-            登録に成功しました
-          </div>
-        </div>
-      )}
       </div>
     </div>
   );
