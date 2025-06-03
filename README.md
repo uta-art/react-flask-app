@@ -211,41 +211,41 @@ https://code.visualstudio.com/
 
 ```bash
 # バックグラウンドで起動
-docker-compose up -d
+docker compose up -d
 
 # ログを表示しながら起動
-docker-compose up
+docker compose up
 ```
 
 ### サービスの停止
 
 ```bash
 # サービス停止
-docker-compose down
+docker compose down
 
 # ボリュームも含めて完全削除
-docker-compose down -v
+docker compose down -v
 ```
 
 ### ログの確認
 
 ```bash
 # 全サービスのログ
-docker-compose logs
+docker compose logs
 
 # 特定のサービスのログ
-docker-compose logs frontend
-docker-compose logs backend
+docker compose logs frontend
+docker compose logs backend
 ```
 
 ### コンテナ内でのコマンド実行
 
 ```bash
 # バックエンドコンテナ内でシェル実行
-docker-compose exec backend bash
+docker compose exec backend bash
 
 # フロントエンドコンテナ内でシェル実行
-docker-compose exec frontend bash
+docker compose exec frontend bash
 ```
 
 ## トラブルシューティング
