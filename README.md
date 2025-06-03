@@ -273,4 +273,10 @@ WSL2内でファイルのパーミッション問題が発生する場合：
 sudo chown -R $USER:$USER .
 chmod -R 755 .
 ```
+### Git
+
+```bash
+# 分岐確認
+git log --oneline --graph --all
+```
 
